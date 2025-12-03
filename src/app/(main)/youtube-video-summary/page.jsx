@@ -60,7 +60,7 @@ const YTSummary = () => {
       setLoading(true);
       setLoadingMsg("Fetching metadata...");
       const res = await axios.get(
-        `http://youtube.com/oembed?url=${link}&format=json`
+        `https://youtube.com/oembed?url=${link}&format=json`
       );
 
       setMetadata(res?.data);
