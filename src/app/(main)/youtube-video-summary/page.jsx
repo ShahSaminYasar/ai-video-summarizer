@@ -25,6 +25,7 @@ import Link from "next/link";
 const YTSummary = () => {
   const searchParams = useSearchParams();
   const link = searchParams?.get("link");
+  const language = searchParams?.get("lang");
 
   //   States
   const [loading, setLoading] = useState(false);
@@ -103,7 +104,9 @@ const YTSummary = () => {
       //   Check for existing
       const checkLocal = JSON.parse(localStorage.getItem("summaries"));
 
-      const targetLocal = checkLocal?.find((s) => s?.video === link);
+      const targetLocal = checkLocal?.find(
+        (s) => s?.video === link && s?.language === language
+      );
 
       if (targetLocal) {
         setSummary(targetLocal?.summary);
@@ -130,6 +133,7 @@ const YTSummary = () => {
           data: transcriptData,
           ...(metadata?.title && { title: metadata?.title }),
           ...(metadata?.description && { description: metadata?.description }),
+          ...(language && { language }),
         });
         const summaryData = getSummary?.data?.data;
         if (getSummary?.data?.ok) {
@@ -140,6 +144,7 @@ const YTSummary = () => {
             video: link,
             transcript: getTranscript?.data?.data,
             summary: summaryData,
+            language,
           });
           localStorage.setItem("summaries", JSON.stringify(localSummaries));
           return setSummary(summaryData);

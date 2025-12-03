@@ -8,6 +8,12 @@ export async function GET(req) {
 
     // const result = await YoutubeTranscript.fetchTranscript(link);
 
+    // return NextResponse.json({
+    //   ok: true,
+    //   data: result,
+    //   text: result?.map((t) => t?.text)?.join(" "),
+    // });
+
     const response = await fetch(
       `https://transcriptapi.com/api/v2/youtube/transcript?video_url=${link}`,
       {
@@ -21,11 +27,18 @@ export async function GET(req) {
 
     const result = await response.json();
 
-    return NextResponse.json({
-      ok: true,
-      data: result?.transcript,
-      text: result?.transcript?.map((t) => t?.text)?.join(" "),
-    });
+    if (result?.transcript?.length > 0) {
+      return NextResponse.json({
+        ok: true,
+        data: result?.transcript,
+        text: result?.transcript?.map((t) => t?.text)?.join(" "),
+      });
+    } else {
+      return NextResponse.json({
+        ok: false,
+        message: "Failed to get transcript",
+      });
+    }
   } catch (error) {
     console.error("SERVER ERROR:", error);
     return NextResponse.json({

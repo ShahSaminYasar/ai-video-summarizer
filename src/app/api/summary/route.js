@@ -5,7 +5,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req) {
   try {
-    const { data, title, description } = await req.json();
+    const { data, title, description, language = "english" } = await req.json();
 
     // console.log(title, description);
 
@@ -29,9 +29,11 @@ Do **not** include:
 
 If the transcript contains spelling mistakes, infer the correct meaning using the video title or description when available.
 
+Settings:
+- Output language: ${language}
+
 ${title && "Video title: " + title}
 ${description && "Video description: " + description}
-
 Video transcript to summarize: ${data}
 `,
     });
