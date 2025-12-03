@@ -372,11 +372,11 @@ const YTSummary = () => {
                 >
                   {transcript?.map((t, i) => (
                     <div
-                      key={`transcript_${t?.lang}_${i}`}
+                      key={`transcript_${i}`}
                       className="w-full bg-white hover:bg-zinc-100 mb-2 text-sm font-normal text-zinc-600 rounded-lg overflow-hidden"
                     >
                       <div className="w-full flex items-center flex-row justify-between gap-3 py-2 px-3">
-                        <span className="text-indigo-600">{t?.offset}</span>
+                        <span className="text-indigo-600">{t?.start}</span>
 
                         <button
                           onClick={() => {

@@ -13,7 +13,7 @@ const page = () => {
 
   return (
     <section
-      className="w-full px-3 bg-linear-to-r min-h-[95vh] pt-[110px] pb-10 flex flex-col items-center justify-center relative"
+      className="w-full px-3 bg-linear-to-r min-h-[70vh] md:min-h-[95vh] pt-[110px] pb-10 flex flex-col items-center justify-center relative"
       style={{
         backgroundImage: "url(/white-bg.jpg)",
         backgroundSize: "cover",
@@ -34,12 +34,17 @@ const page = () => {
         onSubmit={handleSummarize}
         className="flex flex-row items-center justify-center gap-2 bg-white rounded-full pr-2 pl-3 py-2 w-full max-w-3xl mx-auto shadow-xl shadow-black/5 border border-slate-200"
       >
-        <textarea
+        <input
           name="link"
           placeholder="Youtube Video Link"
           className="w-full py-2 px-3 text-sm font-medium text-slate-800 outline-none resize-none"
-          rows={1}
-        ></textarea>
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+          type="text"
+          required
+        ></input>
         <button
           type="submit"
           className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-700 via-indigo-500 to-indigo-600 rounded-full px-5 py-2 text-sm font-semibold text-white cursor-pointer active:scale-95 duration-150 transition-all disabled:grayscale-100"

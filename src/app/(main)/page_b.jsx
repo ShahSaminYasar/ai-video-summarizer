@@ -247,7 +247,7 @@ const Main = () => {
   const handleDownload = async () => {
     try {
       const res = await axios.get(`/api/download-video?link=${videoLink}`);
-      console.log(res);
+      // console.log(res);
     } catch (error) {
       console.error(error);
       return toast.error(error?.message || "Unknown error occured");

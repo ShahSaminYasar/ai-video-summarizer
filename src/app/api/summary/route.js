@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     const { data, title, description } = await req.json();
 
-    console.log(title, description);
+    // console.log(title, description);
 
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
