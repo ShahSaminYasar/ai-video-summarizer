@@ -52,7 +52,7 @@ export async function GET(req) {
 
     return NextResponse.json({
       ok: true,
-      data: description || "Description not found",
+      data: description || null,
       source: description ? getDescriptionSource(html, description) : "none",
     });
   } catch (error) {

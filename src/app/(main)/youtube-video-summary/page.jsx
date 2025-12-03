@@ -145,6 +145,9 @@ const YTSummary = () => {
             transcript: getTranscript?.data?.data,
             summary: summaryData,
             language,
+            title: metadata?.title,
+            thumbnail: metadata?.thumbnail_url,
+            datetime: new Date().toISOString(),
           });
           localStorage.setItem("summaries", JSON.stringify(localSummaries));
           return setSummary(summaryData);
