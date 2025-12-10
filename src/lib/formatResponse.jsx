@@ -76,7 +76,6 @@ const processInlineFormatting = (line) => {
 
 // --- Code Block Extractor ---
 export const formatCodeBlocks = (text) => {
-  console.log(text);
   // Split the text by the code block delimiter (```)
   const parts = text.split(/(```[\s\S]*?```)/g);
 
