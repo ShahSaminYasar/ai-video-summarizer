@@ -2,7 +2,7 @@ import React from "react";
 
 // --- Inline Component Helpers ---
 const InlineCode = ({ content }) => (
-  <code className="bg-purple-200 px-1 py-0.5 rounded text-purple-700 text-sm font-mono">
+  <code className="bg-amber-100 px-1 py-px rounded text-amber-600 text-xs font-space font-medium">
     {content}
   </code>
 );
@@ -76,6 +76,7 @@ const processInlineFormatting = (line) => {
 
 // --- Code Block Extractor ---
 export const formatCodeBlocks = (text) => {
+  console.log(text);
   // Split the text by the code block delimiter (```)
   const parts = text.split(/(```[\s\S]*?```)/g);
 
@@ -160,20 +161,90 @@ const formatTextLines = (text, parentKey) => {
       continue;
     }
 
-    // 4. Ordered Lists Grouping (Fixes numbering)
+    // 4. Ordered Lists with nested content
     if (/^\s*\d+\.\s/.test(line)) {
       const listItems = [];
       let j = i;
 
+      // Process all consecutive numbered lines
       while (j < lines.length && /^\s*\d+\.\s/.test(lines[j])) {
         const liKey = `${key}-${j}`;
         const content = lines[j].replace(/^\s*\d+\.\s/, "").trim();
+
+        // Collect any nested content (bullet points) that follow
+        const nestedContent = [];
+        let k = j + 1;
+
+        while (
+          k < lines.length &&
+          !/^\s*\d+\.\s/.test(lines[k]) && // Not a new numbered item
+          !/^\s*#{1,6}\s/.test(lines[k]) && // Not a heading
+          lines[k].trim() !== "" && // Not empty
+          !lines[k].startsWith("```") // Not a code block
+        ) {
+          // Check for bullet points
+          if (
+            lines[k].trim().startsWith("* ") ||
+            lines[k].trim().startsWith("+ ") ||
+            lines[k].trim().startsWith("- ")
+          ) {
+            const nestedItems = [];
+            while (
+              k < lines.length &&
+              (lines[k].trim().startsWith("* ") ||
+                lines[k].trim().startsWith("+ ") ||
+                lines[k].trim().startsWith("- "))
+            ) {
+              const nestedKey = `${liKey}-nested-${k}`;
+              const nestedContent = lines[k].trim().substring(2).trim();
+              nestedItems.push(
+                <li key={nestedKey} className="text-slate-700 mb-1">
+                  {processInlineFormatting(nestedContent)}
+                </li>
+              );
+              k++;
+            }
+
+            if (nestedItems.length > 0) {
+              nestedContent.push(
+                <ul
+                  key={`${liKey}-nested-list`}
+                  className="my-2 ml-6 list-disc"
+                >
+                  {nestedItems}
+                </ul>
+              );
+            }
+            continue;
+          }
+
+          // Handle regular text under the list item
+          if (lines[k].trim() !== "" && !lines[k].trim().startsWith("```")) {
+            nestedContent.push(
+              <p key={`${liKey}-para-${k}`} className="my-1 text-slate-700">
+                {processInlineFormatting(lines[k])}
+              </p>
+            );
+            k++;
+            continue;
+          }
+
+          break;
+        }
+
+        // Build the main list item
         listItems.push(
-          <li key={liKey} className="text-slate-700 mb-1">
-            {processInlineFormatting(content)}
+          <li key={liKey} className="text-slate-700 mb-3">
+            <strong className="font-medium text-slate-800">
+              {processInlineFormatting(content)}
+            </strong>
+            {nestedContent.length > 0 && (
+              <div className="mt-1">{nestedContent}</div>
+            )}
           </li>
         );
-        j++;
+
+        j = k; // Skip the nested content we've already processed
       }
 
       elements.push(

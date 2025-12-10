@@ -20,6 +20,7 @@ Formatting rules:
 - Use standard paragraphs for explanations.
 - Use bullet points ONLY for listing distinct items (e.g., methods, features, steps) or quoting specific examples.
 - Use emojis and line breaks for clarity when appropriate.
+- If the video is a tutorial, then include detailed and well described steps inside 'Detailed Summary' and put necessary keywords/links/codes inside 'code' tags.
 
 Do **not** include:
 - Greetings of any kind.

@@ -6,7 +6,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const link = searchParams.get("link");
 
-    // const result = await YoutubeTranscript.fetchTranscript(link);
+    // const result = await YoutubeTranscript.fetchTranscript(link); //TODO
 
     // return NextResponse.json({
     //   ok: true,

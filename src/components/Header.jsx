@@ -43,21 +43,21 @@ const Header = () => {
           </Link> */}
 
           {pathname?.includes("/youtube-video-summary") ||
-          pathname?.includes("/history") ? (
-            <Link
-              href={"/"}
-              className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-indigo-300 via-indigo-400 to-indigo-200 border-2 border-indigo-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
-            >
-              <PenTool size={12} /> New
-            </Link>
-          ) : (
-            <Link
-              href={"/history"}
-              className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-indigo-300 via-indigo-400 to-indigo-200 border-2 border-indigo-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
-            >
-              <History size={13} /> History
-            </Link>
-          )}
+            (pathname?.includes("/history") && (
+              <Link
+                href={"/"}
+                className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-indigo-300 via-indigo-400 to-indigo-200 border-2 border-indigo-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
+              >
+                <PenTool size={12} /> New
+              </Link>
+            ))}
+
+          <Link
+            href={"/history"}
+            className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-slate-300 via-slate-400 to-slate-200 border-2 border-slate-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
+          >
+            <History size={13} /> History
+          </Link>
         </div>
       </header>
     </div>
