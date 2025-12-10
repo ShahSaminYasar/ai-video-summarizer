@@ -42,15 +42,14 @@ const Header = () => {
             <Github size={15} />
           </Link> */}
 
-          {pathname?.includes("/youtube-video-summary") ||
-            (pathname?.includes("/history") && (
-              <Link
-                href={"/"}
-                className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-indigo-300 via-indigo-400 to-indigo-200 border-2 border-indigo-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
-              >
-                <PenTool size={12} /> New
-              </Link>
-            ))}
+          {pathname !== "/" && (
+            <Link
+              href={"/"}
+              className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-indigo-300 via-indigo-400 to-indigo-200 border-2 border-indigo-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
+            >
+              <PenTool size={12} /> New
+            </Link>
+          )}
 
           <Link
             href={"/history"}

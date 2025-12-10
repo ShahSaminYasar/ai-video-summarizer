@@ -182,7 +182,7 @@ const YTSummary = () => {
               className="w-full aspect-video rounded-sm overflow-hidden mb-2"
             />
 
-            <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-2">
+            <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-2 mt-3">
               {metadata?.author_name && (
                 <Link
                   href={metadata?.author_url || "#"}
@@ -246,7 +246,7 @@ const YTSummary = () => {
                 >
                   <button
                     onClick={() => setDescOpen((prev) => !prev)}
-                    className={`text-zinc-800 cursor-pointer flex items-center gap-1 text-xs`}
+                    className={`text-zinc-800 cursor-pointer flex items-center gap-1 text-xs font-medium`}
                   >
                     {descOpen ? "See less" : "See more"}
                     <ChevronDown
@@ -265,7 +265,7 @@ const YTSummary = () => {
         {/* Summary */}
         <section className="w-full h-full relative md:pl-5 md:pr-2 border-slate-200">
           {/* Tab Nav */}
-          <div className="sticky top-14 md:top-16 pt-4 md:-mt-4 pb-3 bg-white z-20">
+          <div className="sticky top-14 md:top-16 pt-3 md:-mt-4 pb-2 bg-white z-20 sm:shadow-none">
             <AnimatePresence>
               {!errorMsg && (
                 <motion.div
@@ -406,6 +406,11 @@ const YTSummary = () => {
               )}
             </AnimatePresence>
           </div>
+
+          {/* FOR TESTING PURPOSE ONLY */}
+          {/* <pre className="bg-black w-full text-white p-2 overflow-auto text-xs">
+            {summary}
+          </pre> */}
         </section>
       </div>
     </div>

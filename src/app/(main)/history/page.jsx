@@ -1,5 +1,5 @@
 "use client";
-import { Notebook, WandSparkles, Clock, Youtube } from "lucide-react";
+import { Notebook, WandSparkles, Clock, Youtube, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -17,6 +17,14 @@ import moment from "moment-timezone";
 const History = () => {
   // State for summaries, initialized to an array to handle the loading state better visually
   const [summaries, setSummaries] = useState(null);
+
+  const handleDelete = (id) => {
+    if (summaries?.length === 0) return;
+
+    const updatedList = summaries?.filter((_, i) => i !== id);
+    setSummaries(updatedList);
+    localStorage.setItem("summaries", JSON.stringify(updatedList));
+  };
 
   useEffect(() => {
     const getSetSummaries = () => {
@@ -112,15 +120,29 @@ const History = () => {
                   )}
                   {/* Optional: Language tag if important */}
                   {s?.language && (
-                    <span className="absolute top-2 right-2 text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-500 text-white shadow">
+                    <span className="absolute top-2 left-2 text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-500 text-white shadow">
                       {s.language.toUpperCase()}
                     </span>
                   )}
+                  <button
+                    onClick={() => {
+                      const confirmDelete = confirm(
+                        "Are you sure to delete this summary from history?"
+                      );
+
+                      if (confirmDelete) {
+                        handleDelete(i);
+                      }
+                    }}
+                    className="absolute top-2 right-2 rounded-full bg-red-500 text-red-100 shadow p-2 aspect-square border-2 border-red-100 cursor-pointer"
+                  >
+                    <Trash size={15} />
+                  </button>
                 </div>
 
                 {/* Content Details */}
                 <div className="p-4 flex flex-col justify-between h-[calc(100%-9rem)]">
-                  <h4 className="text-base font-semibold text-gray-900 line-clamp-2 mb-2 min-h-[3rem]">
+                  <h4 className="text-base font-semibold text-gray-900 line-clamp-2 mb-2 min-h-12">
                     {s?.title || "Untitled Summary"}
                   </h4>
 

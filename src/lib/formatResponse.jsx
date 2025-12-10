@@ -7,116 +7,220 @@ const InlineCode = ({ content }) => (
   </code>
 );
 
-// --- Core Logic for Inline Formatting ---
-const processInlineFormatting = (line) => {
-  // Regex: Match inline code, bold, italic, strikethrough
-  const regex =
-    /(\`{1,2}[^`]*\`{1,2})|(\*\*[^\*]+\*\*)|(\*[^\*]+\*)|(\_\_[^\_]+\_\_)|(\_[^\_]+\_)|(\~\~[^\~]+\~\~)/g;
+// --- Block Code Component ---
+const BlockCode = ({ content, language = "" }) => (
+  <div className="my-4">
+    <pre className="bg-gray-800 p-4 rounded text-white overflow-x-auto text-xs font-space">
+      <code data-language={language}>{content}</code>
+    </pre>
+  </div>
+);
 
+// --- Process inline formatting for text (backticks, bold, italic, etc.) ---
+const processInlineFormatting = (text) => {
+  // This handles markdown (backticks, bold, italic, etc.)
+
+  // Process in order: backticks first, then other formatting
   const segments = [];
   let currentIndex = 0;
-  let match;
 
-  while ((match = regex.exec(line)) !== null) {
-    const fullMatch = match[0];
-    const matchIndex = match.index;
+  // Look for the next formatting element
+  while (currentIndex < text.length) {
+    // Find the next special character
+    const nextBacktick = text.indexOf("`", currentIndex);
+    const nextDoubleAsterisk = text.indexOf("**", currentIndex);
+    const nextSingleAsterisk = text.indexOf("*", currentIndex);
+    const nextDoubleUnderscore = text.indexOf("__", currentIndex);
+    const nextSingleUnderscore = text.indexOf("_", currentIndex);
+    const nextTilde = text.indexOf("~~", currentIndex);
 
-    if (matchIndex > currentIndex) {
-      segments.push(line.slice(currentIndex, matchIndex));
+    // Find the earliest formatting marker
+    const markers = [
+      { pos: nextBacktick, type: "backtick", length: 1 },
+      { pos: nextDoubleAsterisk, type: "doubleAsterisk", length: 2 },
+      { pos: nextSingleAsterisk, type: "singleAsterisk", length: 1 },
+      { pos: nextDoubleUnderscore, type: "doubleUnderscore", length: 2 },
+      { pos: nextSingleUnderscore, type: "singleUnderscore", length: 1 },
+      { pos: nextTilde, type: "tilde", length: 2 },
+    ]
+      .filter((m) => m.pos !== -1 && m.pos >= currentIndex)
+      .sort((a, b) => a.pos - b.pos);
+
+    if (markers.length === 0) {
+      // No more formatting markers, add remaining text
+      segments.push(text.slice(currentIndex));
+      break;
     }
 
-    let content = "";
-    let element = null;
+    const marker = markers[0];
 
-    if (match[1]) {
-      // Inline Code
-      content = fullMatch.replace(/^`{1,2}|`{1,2}$/g, "");
-      element = <InlineCode key={segments.length} content={content} />;
-    } else if (match[2]) {
-      // Bold
-      content = fullMatch.slice(2, -2);
-      element = (
-        <strong key={segments.length} className="font-medium text-slate-800">
-          {content}
-        </strong>
-      );
-    } else if (match[3] || match[5]) {
-      // Italic
-      content = fullMatch.slice(1, -1);
-      element = (
-        <em key={segments.length} className="italic text-slate-700">
-          {content}
-        </em>
-      );
-    } else if (match[6]) {
-      // Strikethrough
-      content = fullMatch.slice(2, -2);
-      element = (
-        <span key={segments.length} className="line-through text-slate-500">
-          {content}
-        </span>
-      );
+    // Add plain text before the marker
+    if (marker.pos > currentIndex) {
+      segments.push(text.slice(currentIndex, marker.pos));
     }
 
-    if (element) {
-      segments.push(element);
-    } else {
-      segments.push(fullMatch);
+    // Handle the formatted section
+    if (marker.type === "backtick") {
+      // Find the closing backtick
+      const closingIndex = text.indexOf("`", marker.pos + 1);
+      if (closingIndex !== -1) {
+        const content = text.slice(marker.pos + 1, closingIndex);
+        segments.push(
+          <InlineCode key={`code-${marker.pos}`} content={content} />
+        );
+        currentIndex = closingIndex + 1;
+      } else {
+        // No closing backtick, add as plain text
+        segments.push(text.slice(marker.pos, marker.pos + 1));
+        currentIndex = marker.pos + 1;
+      }
+    } else if (marker.type === "doubleAsterisk") {
+      // Find the closing **
+      const closingIndex = text.indexOf("**", marker.pos + 2);
+      if (closingIndex !== -1) {
+        const content = text.slice(marker.pos + 2, closingIndex);
+        // Recursively process content for nested formatting (like backticks)
+        const processedContent = processInlineFormatting(content);
+        segments.push(
+          <strong
+            key={`bold-${marker.pos}`}
+            className="font-medium text-slate-800"
+          >
+            {processedContent}
+          </strong>
+        );
+        currentIndex = closingIndex + 2;
+      } else {
+        // No closing **, add as plain text
+        segments.push(text.slice(marker.pos, marker.pos + 2));
+        currentIndex = marker.pos + 2;
+      }
+    } else if (marker.type === "singleAsterisk") {
+      // Find the closing *
+      const closingIndex = text.indexOf("*", marker.pos + 1);
+      if (closingIndex !== -1 && closingIndex !== marker.pos) {
+        const content = text.slice(marker.pos + 1, closingIndex);
+        const processedContent = processInlineFormatting(content);
+        segments.push(
+          <em key={`italic-${marker.pos}`} className="italic text-slate-700">
+            {processedContent}
+          </em>
+        );
+        currentIndex = closingIndex + 1;
+      } else {
+        // No closing *, add as plain text
+        segments.push(text.slice(marker.pos, marker.pos + 1));
+        currentIndex = marker.pos + 1;
+      }
+    } else if (marker.type === "doubleUnderscore") {
+      // Find the closing __
+      const closingIndex = text.indexOf("__", marker.pos + 2);
+      if (closingIndex !== -1) {
+        const content = text.slice(marker.pos + 2, closingIndex);
+        const processedContent = processInlineFormatting(content);
+        segments.push(
+          <strong
+            key={`bold2-${marker.pos}`}
+            className="font-medium text-slate-800"
+          >
+            {processedContent}
+          </strong>
+        );
+        currentIndex = closingIndex + 2;
+      } else {
+        segments.push(text.slice(marker.pos, marker.pos + 2));
+        currentIndex = marker.pos + 2;
+      }
+    } else if (marker.type === "singleUnderscore") {
+      // Find the closing _
+      const closingIndex = text.indexOf("_", marker.pos + 1);
+      if (closingIndex !== -1 && closingIndex !== marker.pos) {
+        const content = text.slice(marker.pos + 1, closingIndex);
+        const processedContent = processInlineFormatting(content);
+        segments.push(
+          <em key={`italic2-${marker.pos}`} className="italic text-slate-700">
+            {processedContent}
+          </em>
+        );
+        currentIndex = closingIndex + 1;
+      } else {
+        segments.push(text.slice(marker.pos, marker.pos + 1));
+        currentIndex = marker.pos + 1;
+      }
+    } else if (marker.type === "tilde") {
+      // Find the closing ~~
+      const closingIndex = text.indexOf("~~", marker.pos + 2);
+      if (closingIndex !== -1) {
+        const content = text.slice(marker.pos + 2, closingIndex);
+        const processedContent = processInlineFormatting(content);
+        segments.push(
+          <span
+            key={`strike-${marker.pos}`}
+            className="line-through text-slate-500"
+          >
+            {processedContent}
+          </span>
+        );
+        currentIndex = closingIndex + 2;
+      } else {
+        segments.push(text.slice(marker.pos, marker.pos + 2));
+        currentIndex = marker.pos + 2;
+      }
     }
-
-    currentIndex = matchIndex + fullMatch.length;
   }
 
-  if (currentIndex < line.length) {
-    segments.push(line.slice(currentIndex));
-  }
-
-  return segments.length > 0 ? segments : line;
+  return segments.length > 0 ? segments : text;
 };
 
-// --- Code Block Extractor ---
-export const formatCodeBlocks = (text) => {
-  // Split the text by the code block delimiter (```)
-  const parts = text.split(/(```[\s\S]*?```)/g);
-
-  return parts.map((part, index) => {
-    if (part.startsWith("```")) {
-      // Code block processing
-      const match = part.match(/```(\w*)\n([\s\S]*?)```/);
-      const language = match ? match[1] : "";
-      const code = match ? match[2].trim() : part.replace(/```/g, "").trim();
-
-      return (
-        <div key={index} className="my-4">
-          <pre className="bg-gray-800 p-4 rounded text-white overflow-x-auto text-sm font-mono">
-            <code data-language={language}>{code}</code>
-          </pre>
-        </div>
-      );
-    } else {
-      // Regular text processing
-      return formatTextLines(part, index);
-    }
-  });
-};
-
-// --- Main Line Processing Logic with Block Grouping ---
+// --- Main Line Processing Logic ---
 const formatTextLines = (text, parentKey) => {
   if (!text || text.trim() === "") {
-    return <React.Fragment key={parentKey} />;
+    return [];
   }
 
-  const lines = text.split("\n").filter((line) => line.length > 0);
+  // First, let's handle any code blocks that might be in the text
+  // But we need to be careful not to break lists
+  const lines = text.split("\n");
   const elements = [];
   let i = 0;
 
   while (i < lines.length) {
     const line = lines[i];
+
+    // Skip empty lines
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
+
     const key = `${parentKey}-${i}`;
 
-    // 1. Horizontal Rules
-    if (line.trim() === "---" || line.trim() === "***") {
-      elements.push(<hr key={key} className="w-full my-4 border-gray-300" />);
+    // 1. Check for code blocks
+    if (line.trim().startsWith("```")) {
+      // Collect the entire code block
+      const codeBlockLines = [];
+      codeBlockLines.push(line);
+      i++;
+
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeBlockLines.push(lines[i]);
+        i++;
+      }
+
+      if (i < lines.length) {
+        codeBlockLines.push(lines[i]); // Add the closing ```
+      }
+
+      const codeBlockText = codeBlockLines.join("\n");
+      const match = codeBlockText.match(/```(\w*)\n([\s\S]*?)```/);
+      const language = match ? match[1] : "";
+      const code = match
+        ? match[2].trim()
+        : codeBlockText.replace(/```/g, "").trim();
+
+      elements.push(
+        <BlockCode key={`code-${key}`} content={code} language={language} />
+      );
       i++;
       continue;
     }
@@ -164,23 +268,69 @@ const formatTextLines = (text, parentKey) => {
     if (/^\s*\d+\.\s/.test(line)) {
       const listItems = [];
       let j = i;
+      let listCounter = 0;
 
       // Process all consecutive numbered lines
       while (j < lines.length && /^\s*\d+\.\s/.test(lines[j])) {
-        const liKey = `${key}-${j}`;
+        listCounter++;
+        const liKey = `${key}-item-${listCounter}`;
         const content = lines[j].replace(/^\s*\d+\.\s/, "").trim();
 
-        // Collect any nested content (bullet points) that follow
+        // Collect any nested content (bullet points, code blocks) that follow
         const nestedContent = [];
         let k = j + 1;
+        let nestedListCounter = 0;
 
         while (
           k < lines.length &&
           !/^\s*\d+\.\s/.test(lines[k]) && // Not a new numbered item
           !/^\s*#{1,6}\s/.test(lines[k]) && // Not a heading
-          lines[k].trim() !== "" && // Not empty
-          !lines[k].startsWith("```") // Not a code block
+          (lines[k].trim() === "" || // Empty line (continuation)
+            lines[k].match(/^\s{4,}/) || // Indented line
+            lines[k].trim().startsWith("* ") || // Bullet point
+            lines[k].trim().startsWith("+ ") || // Bullet point
+            lines[k].trim().startsWith("- ") || // Bullet point
+            lines[k].trim().startsWith("```")) // Code block
         ) {
+          // Skip empty lines (they're allowed in lists)
+          if (lines[k].trim() === "") {
+            k++;
+            continue;
+          }
+
+          // Check for code blocks
+          if (lines[k].trim().startsWith("```")) {
+            const codeBlockLines = [];
+            codeBlockLines.push(lines[k]);
+            k++;
+
+            while (k < lines.length && !lines[k].trim().startsWith("```")) {
+              codeBlockLines.push(lines[k]);
+              k++;
+            }
+
+            if (k < lines.length) {
+              codeBlockLines.push(lines[k]); // Add the closing ```
+            }
+
+            const codeBlockText = codeBlockLines.join("\n");
+            const match = codeBlockText.match(/```(\w*)\n([\s\S]*?)```/);
+            const language = match ? match[1] : "";
+            const code = match
+              ? match[2].trim()
+              : codeBlockText.replace(/```/g, "").trim();
+
+            nestedContent.push(
+              <BlockCode
+                key={`${liKey}-code-${k}`}
+                content={code}
+                language={language}
+              />
+            );
+            k++;
+            continue;
+          }
+
           // Check for bullet points
           if (
             lines[k].trim().startsWith("* ") ||
@@ -188,27 +338,31 @@ const formatTextLines = (text, parentKey) => {
             lines[k].trim().startsWith("- ")
           ) {
             const nestedItems = [];
+            let nestedItemCounter = 0;
+
             while (
               k < lines.length &&
               (lines[k].trim().startsWith("* ") ||
                 lines[k].trim().startsWith("+ ") ||
                 lines[k].trim().startsWith("- "))
             ) {
-              const nestedKey = `${liKey}-nested-${k}`;
-              const nestedContent = lines[k].trim().substring(2).trim();
+              nestedItemCounter++;
+              const nestedKey = `${liKey}-nested-item-${nestedItemCounter}`;
+              const nestedContentText = lines[k].trim().substring(2).trim();
               nestedItems.push(
-                <li key={nestedKey} className="text-slate-700 mb-1">
-                  {processInlineFormatting(nestedContent)}
+                <li key={nestedKey} className="text-slate-700 mb-1 ml-4">
+                  {processInlineFormatting(nestedContentText)}
                 </li>
               );
               k++;
             }
 
             if (nestedItems.length > 0) {
+              nestedListCounter++;
               nestedContent.push(
                 <ul
-                  key={`${liKey}-nested-list`}
-                  className="my-2 ml-6 list-disc"
+                  key={`${liKey}-nested-list-${nestedListCounter}`}
+                  className="my-2 ml-8 list-disc"
                 >
                   {nestedItems}
                 </ul>
@@ -217,26 +371,23 @@ const formatTextLines = (text, parentKey) => {
             continue;
           }
 
-          // Handle regular text under the list item
-          if (lines[k].trim() !== "" && !lines[k].trim().startsWith("```")) {
-            nestedContent.push(
-              <p key={`${liKey}-para-${k}`} className="my-1 text-slate-700">
-                {processInlineFormatting(lines[k])}
-              </p>
-            );
-            k++;
-            continue;
-          }
-
-          break;
+          // Handle indented text (continuation of list item)
+          const indentedText = lines[k].trim();
+          nestedContent.push(
+            <p
+              key={`${liKey}-indented-${k}`}
+              className="my-1 text-slate-700 ml-4"
+            >
+              {processInlineFormatting(indentedText)}
+            </p>
+          );
+          k++;
         }
 
         // Build the main list item
         listItems.push(
           <li key={liKey} className="text-slate-700 mb-3">
-            <strong className="font-medium text-slate-800">
-              {processInlineFormatting(content)}
-            </strong>
+            {processInlineFormatting(content)}
             {nestedContent.length > 0 && (
               <div className="mt-1">{nestedContent}</div>
             )}
@@ -247,7 +398,7 @@ const formatTextLines = (text, parentKey) => {
       }
 
       elements.push(
-        <ol key={`ol-${key}`} className="my-2 ml-8 list-decimal">
+        <ol key={`ol-${key}-${listCounter}`} className="my-2 ml-8 list-decimal">
           {listItems}
         </ol>
       );
@@ -263,6 +414,7 @@ const formatTextLines = (text, parentKey) => {
     ) {
       const listItems = [];
       let j = i;
+      let ulItemCounter = 0;
 
       while (
         j < lines.length &&
@@ -270,7 +422,8 @@ const formatTextLines = (text, parentKey) => {
           lines[j].trim().startsWith("+ ") ||
           lines[j].trim().startsWith("- "))
       ) {
-        const liKey = `${key}-${j}`;
+        ulItemCounter++;
+        const liKey = `${key}-ul-item-${ulItemCounter}`;
         const content = lines[j].trim().substring(2).trim();
         listItems.push(
           <li key={liKey} className="text-slate-700 mb-1">
@@ -281,7 +434,7 @@ const formatTextLines = (text, parentKey) => {
       }
 
       elements.push(
-        <ul key={`ul-${key}`} className="my-2 ml-8 list-disc">
+        <ul key={`ul-${key}-${ulItemCounter}`} className="my-2 ml-8 list-disc">
           {listItems}
         </ul>
       );
@@ -304,14 +457,22 @@ const formatTextLines = (text, parentKey) => {
       continue;
     }
 
-    // 7. Regular Paragraph - Using my-2 for consistent spacing
+    // 7. Regular Paragraph
     elements.push(
       <p key={key} className="my-2 text-slate-700">
         {processInlineFormatting(line)}
       </p>
     );
+
     i++;
   }
 
   return elements;
+};
+
+// --- Code Block Extractor ---
+export const formatCodeBlocks = (text) => {
+  // We're now handling code blocks in formatTextLines directly
+  // So this function just delegates to formatTextLines
+  return formatTextLines(text, "root");
 };
