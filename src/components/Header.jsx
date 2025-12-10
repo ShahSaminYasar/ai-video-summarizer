@@ -54,9 +54,15 @@ const Header = () => {
 
           <Link
             href={"/history"}
-            className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-slate-300 via-slate-400 to-slate-200 border-2 border-slate-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95"
+            className="md:flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-slate-300 via-slate-400 to-slate-200 border-2 border-slate-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95 hidden"
           >
             <History size={13} /> History
+          </Link>
+          <Link
+            href={"/history"}
+            className="flex items-center flex-nowrap flex-row gap-1 rounded-full text-xs bg-linear-to-br from-slate-300 via-slate-400 to-slate-200 border-2 border-slate-500 font-semibold text-white h-[31px] justify-center px-3 shadow-sm transition-all duration-75 active:scale-95 md:hidden"
+          >
+            <History size={13} />
           </Link>
         </div>
       </header>
