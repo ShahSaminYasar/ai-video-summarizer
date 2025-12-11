@@ -10,8 +10,10 @@ const InlineCode = ({ content }) => (
 // --- Block Code Component ---
 const BlockCode = ({ content, language = "" }) => (
   <div className="my-4">
-    <pre className="bg-gray-800 p-4 rounded text-white overflow-x-auto text-xs font-space">
-      <code data-language={language}>{content}</code>
+    <pre className="bg-gray-900 p-4 rounded-sm text-white/95 overflow-x-auto text-xs font-space">
+      <code data-language={language} className="font-medium">
+        {content}
+      </code>
     </pre>
   </div>
 );

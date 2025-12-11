@@ -5,54 +5,52 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req) {
   try {
-    const { data, title, description, language = "english" } = await req.json();
+    const {
+      data,
+      title,
+      description,
+      language = "english",
+      model,
+    } = await req.json();
 
-    // console.log(title, description);
+    if (!model)
+      return NextResponse.json({
+        ok: false,
+        message: "No model defined",
+      });
 
     const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `You are a **professional video summarizer**. Given the *transcript* of a YouTube video, produce two summaries:
+      model: model,
+      contents: `You are a **professional video summarizer**. Given the *transcript* of a video, produce two summaries:
 
 1. Begin with the heading **"Brief Summary"** (formatted as ### Brief Summary) and provide 3 to 5 sentences capturing the most important points.
 2. Then include the heading **"Detailed Summary"** (formatted as ### Detailed Summary) and provide a full, detailed explanation preserving all key arguments, quotes, and insights.
-- NB: Both the headings must use ### markdown level. All other headings (if any) must use #### or smaller.
+- NB: Both the headings must use ### markdown level. All other headings (sub-headings) (if any) must use #### or smaller.
 
 Formatting rules:
 - Use standard paragraphs for explanations.
-- Use bullet points ONLY for listing distinct items (e.g., methods, features, steps) or quoting specific examples.
-- Use emojis and line breaks for clarity when appropriate.
-- If the video is a tutorial, then include detailed and well described steps inside 'Detailed Summary'.
+- Use bullet points ONLY for listing distinct items (e.g., methods, features, steps) or quoting specific examples/points.
+- Use emojis and line breaks for clarity when appropriate, especially in the Detailed Summary. Try to always add a relatable emoji to every sub-heading (before the sub-heading text) inside of "Detailed Summary", e.g. '#### <emoji> <text>'.
+- If the video is a tutorial (coding, DIY, educational, etc.), then include detailed and well-described steps/sections inside 'Detailed Summary'.
+
+---
+
+### Code and Technical Formatting Rules (Apply ONLY when code/technical content is present)
 
 - **IMPORTANT FORMATTING RULE**: For code snippets, file names, commands, or technical terms that should be highlighted:
   - Wrap them in backticks like \`code\`, NOT in HTML tags.
   - Example: \`npm install express\`, \`package.json\`, \`process.env.PORT\`
-  - **NEVER use HTML tags like <code>, <pre>, or any other HTML elements**
-  - For multi-line code blocks, use triple backticks with language specification:
-    \`\`\`javascript
-    const example = "code block";
-    \`\`\`
+  - **NEVER use HTML tags like <code>, <pre>, or any other HTML elements**.
 
-CODE FORMATTING & GROUPING RULES:
-1. Use inline backticks (\`code\`) ONLY for:
-   - Short single items such as variable names, file names, properties, commands, or short expressions.
-   - One-line code references that do not depend on surrounding lines.
-2. Use multi-line triple-backtick code blocks when the transcript contains:
-   - Multiple consecutive lines that clearly belong to one logical unit.
-   - Any structured or formatted content that is easier to understand as a block.
-   - Examples:
-     • multi-line code
-     • configuration blocks
-     • structured data
-     • lists of fields or parameters that form one object or dataset
-   (These are examples only — always decide smartly whether it will look good in multiline or not - for better readability.)
-3. Code completeness rule:
-   - When the transcript describes a multi-step process that forms a single code block, include **all related lines together** inside the same triple-backtick block.
-   - Do NOT split them into separate inline code fragments.
-4. Smart decision rule:
-   - Use multi-line blocks only when they improve clarity and preserve structure.
-   - Use inline code for isolated items or single line codes or definitions etc.
-   - If unsure, prefer a multi-line block when several related items appear back-to-back in the transcript.
-5. NEVER add HTML tags. Only markdown is allowed.
+#### CODE BLOCK GUIDELINES:
+
+1.  **Inline Backticks (\`code\`):** Use ONLY for short single items such as variable names, file names, properties, commands, single-line definitions, or short expressions.
+2.  **Triple-Backtick Blocks (\`\`\`language):** Use for multi-line code, configuration blocks, structured data, or multiple consecutive lines that form **one logical, reproducible unit**.
+3.  **The Reproducibility Principle:** When the transcript describes a multi-step process or a standard structure (like boilerplate, configuration setup, or full function definitions), include **all related lines together** inside the same triple-backtick block.
+    - **Specific Rule for Boilerplate:** If the video repeatedly shows a basic structure (for example: a Mongoose schema definition/export or a basic component setup), capture the **complete, representative boilerplate** in a single code block the *first* time it's introduced, even if the video breaks the explanation into theoretical parts. This gives the user a working starting point. Afterwards you can explain each part separately if you feel the need of it.
+4.  **Clarity Rule:** If grouping related items into a block (even if they appear slightly separated in the transcript) improves clarity and preserves the structural context of the code, use the multi-line block.
+
+---
 
 Do **not** include:
 - Greetings of any kind.
@@ -61,7 +59,7 @@ Do **not** include:
 - Any text before the **Brief Summary** heading.
 - **ANY HTML TAGS** — only use markdown formatting (headings, bold, italic, backticks, bullet points).
 
-If the transcript contains spelling mistakes, infer the correct meaning using the video title or description when available. Especially if it is related to a product or has links - always check the given metadata for correct spelling.
+If the transcript contains spelling mistakes, infer the correct meaning using the video title or description when available. Especially if it is a product related video or some link, always check the correct spelling from the given metadata.
 
 Settings:
 - Output language: ${language}

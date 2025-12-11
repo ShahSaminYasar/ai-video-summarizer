@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const Home = () => {
   const [lang, setLang] = useState("english");
+  const [model, setModel] = useState("gemini-2.5-flash");
 
   const handleSummarize = (e) => {
     e.preventDefault();
@@ -12,7 +13,9 @@ const Home = () => {
     if (!link) return;
 
     return redirect(
-      `/youtube-video-summary?link=${encodeURIComponent(link)}&lang=${lang}`
+      `/youtube-video-summary?link=${encodeURIComponent(
+        link
+      )}&lang=${lang}&model=${model}`
     );
   };
 
@@ -80,6 +83,22 @@ const Home = () => {
             >
               বাং
             </button>
+
+            {/* Model Select */}
+            <select
+              name="model_select"
+              value={model}
+              onChange={(e) => {
+                setModel(e.target?.value);
+              }}
+              className="w-fit block py-1 px-3 rounded-full bg-sky-100 border-2 border-sky-200 text-xs cursor-pointer"
+            >
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="gemini-2.5-flash-lite">
+                Gemini 2.5 Flash Lite
+              </option>
+            </select>
           </div>
 
           <button

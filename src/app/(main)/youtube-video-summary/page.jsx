@@ -26,6 +26,7 @@ const YTSummary = () => {
   const searchParams = useSearchParams();
   const link = searchParams?.get("link");
   const language = searchParams?.get("lang");
+  const model = searchParams?.get("model");
 
   //   States
   const [loading, setLoading] = useState(false);
@@ -134,6 +135,7 @@ const YTSummary = () => {
           ...(metadata?.title && { title: metadata?.title }),
           ...(metadata?.description && { description: metadata?.description }),
           ...(language && { language }),
+          ...(model && { model }),
         });
         const summaryData = getSummary?.data?.data;
         if (getSummary?.data?.ok) {
@@ -154,8 +156,9 @@ const YTSummary = () => {
         } else {
           setSummary(null);
           return setErrorMsg(
-            getSummary?.data?.message ||
-              "Failed to generate summary, either the video is too long or there was an issue with the server."
+            "Try changing the model to fix this error\n===========" +
+              getSummary?.data?.message ||
+              "Failed to generate summary, either the video is too long or there was an issue with the server. Try changing the model."
           );
         }
       }
@@ -308,7 +311,7 @@ const YTSummary = () => {
                 exit={{ opacity: 0 }}
                 className="relative w-full rounded-sm shadow-sm bg-linear-to-br from-rose-500 via-rose-700 to-rose-500 text-white/90 text-xs font-medium font-space text-center py-6 px-4 mb-6 flex flex-col items-start gap-3 mx-auto"
               >
-                {errorMsg}
+                {parse(decode(errorMsg))}
 
                 <button
                   onClick={() => {
