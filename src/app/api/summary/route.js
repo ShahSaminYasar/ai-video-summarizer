@@ -10,7 +10,7 @@ export async function POST(req) {
     // console.log(title, description);
 
     const result = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       contents: `You are a **professional video summarizer**. Given the *transcript* of a YouTube video, produce two summaries:
 
 1. Begin with the heading **"Brief Summary"** (formatted as ### Brief Summary) and provide 3 to 5 sentences capturing the most important points.
@@ -61,7 +61,7 @@ Do **not** include:
 - Any text before the **Brief Summary** heading.
 - **ANY HTML TAGS** — only use markdown formatting (headings, bold, italic, backticks, bullet points).
 
-If the transcript contains spelling mistakes, infer the correct meaning using the video title or description when available.
+If the transcript contains spelling mistakes, infer the correct meaning using the video title or description when available. Especially if it is related to a product or has links - always check the given metadata for correct spelling.
 
 Settings:
 - Output language: ${language}
