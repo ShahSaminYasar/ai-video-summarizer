@@ -265,7 +265,7 @@ const YTSummary = () => {
         {/* Summary */}
         <section className="w-full h-full relative md:pl-5 md:pr-2 border-slate-200">
           {/* Tab Nav */}
-          <div className="sticky top-14 md:top-16 pt-3 md:-mt-4 pb-2 bg-white z-20 sm:shadow-none">
+          <div className="sticky top-14 md:top-16 pt-3 md:pt-4 md:-mt-4 pb-2 bg-white z-20 sm:shadow-none">
             <AnimatePresence>
               {!errorMsg && (
                 <motion.div
