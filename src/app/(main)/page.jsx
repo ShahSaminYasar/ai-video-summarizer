@@ -54,7 +54,7 @@ const Home = () => {
           required
         ></input>
 
-        <div className="w-full flex flex-row justify-between items-center gap-3">
+        <div className="w-full flex flex-col md:flex-row justify-between items-start gap-3">
           <div className="w-fit flex items-center gap-3 text-xs font-space font-medium">
             <span className="text-slate-500 block ml-3">
               <Languages size={13} />
@@ -103,7 +103,7 @@ const Home = () => {
 
           <button
             type="submit"
-            className="flex items-center justify-center gap-2 bg-linear-to-r from-indigo-700 via-indigo-500 to-indigo-600 rounded-full px-5 py-2 text-sm font-semibold text-white cursor-pointer active:scale-95 duration-150 transition-all disabled:grayscale-100"
+            className="flex ml-auto items-center justify-center gap-2 bg-linear-to-r from-indigo-700 via-indigo-500 to-indigo-600 rounded-full px-5 py-2 text-sm font-semibold text-white cursor-pointer active:scale-95 duration-150 transition-all disabled:grayscale-100"
           >
             <span className="block -mt-0.5">Summarize</span>{" "}
             <WandSparkles size={16} />

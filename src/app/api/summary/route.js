@@ -25,6 +25,7 @@ export async function POST(req) {
 
 1. Begin with the heading **"Brief Summary"** (formatted as ### Brief Summary) and provide 3 to 5 sentences capturing the most important points.
 2. Then include the heading **"Detailed Summary"** (formatted as ### Detailed Summary) and provide a full, detailed explanation preserving all key arguments, quotes, and insights.
+      - If the video is a **tutorial, coding session, or educational lecture**, present the detailed summary as **clear, well-written notes** that thoroughly cover all concepts, steps, and explanations discussed.
 - NB: Both the headings must use ### markdown level. All other headings (sub-headings) (if any) must use #### or smaller.
 
 Formatting rules:

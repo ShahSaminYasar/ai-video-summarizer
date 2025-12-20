@@ -4,6 +4,8 @@ import {
   ChevronDown,
   Copy,
   Download,
+  Maximize,
+  Minimize,
   RefreshCcw,
   Share2,
   User,
@@ -38,6 +40,7 @@ const YTSummary = () => {
   const [metadata, setMetadata] = useState(null);
   const [metadataFetched, setMetadataFetched] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
+  const [summaryZoomed, setSummaryZoomed] = useState(false);
 
   useEffect(() => {
     if (!link) return redirect("/");
@@ -175,7 +178,11 @@ const YTSummary = () => {
     <div className="bg-white min-h-[90vh] text-black px-3 pt-[75px] md:pt-20 pb-3 grid font-space">
       <div className="w-full h-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-0 items-start justify-center">
         {/* Video */}
-        <section className="w-full h-full relative md:pr-5 md:pl-2 border-slate-200 md:border-r">
+        <section
+          className={`w-full h-full relative md:pr-5 md:pl-2 border-slate-200 md:border-r ${
+            summaryZoomed ? "hidden" : "block"
+          }`}
+        >
           <div className="md:sticky md:top-20">
             <ReactPlayer
               src={link}
@@ -266,7 +273,11 @@ const YTSummary = () => {
         </section>
 
         {/* Summary */}
-        <section className="w-full h-full relative md:pl-5 md:pr-2 border-slate-200">
+        <section
+          className={`w-full max-w-5xl mx-auto h-full relative md:pl-5 md:pr-2 border-slate-200 ${
+            summaryZoomed ? "md:col-span-2" : "md:col-span-1"
+          }`}
+        >
           {/* Tab Nav */}
           <div className="sticky top-14 md:top-16 pt-3 md:pt-4 md:-mt-4 pb-2 bg-white z-20 sm:shadow-none">
             <AnimatePresence>
@@ -296,6 +307,19 @@ const YTSummary = () => {
                     }`}
                   >
                     <Captions size={15} /> Transcript
+                  </button>
+
+                  <button
+                    className={`hidden md:block w-fit ml-auto text-white mr-1 cursor-pointer`}
+                    onClick={() => {
+                      setSummaryZoomed((prev) => !prev);
+                    }}
+                  >
+                    {summaryZoomed ? (
+                      <Minimize size={15} />
+                    ) : (
+                      <Maximize size={15} />
+                    )}
                   </button>
                 </motion.div>
               )}
