@@ -179,3 +179,18 @@ body {
   background-color: #e2e8f0;
   border-radius: 20px;
 }
+
+/* Math block spacing */
+.katex-display {
+  margin: 1.5rem 0 !important;
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+/* Cursive Keywords for Syntax Highlighting */
+.code-block-wrapper .token.keyword,
+.code-block-wrapper .token.function,
+.code-block-wrapper .token.italic,
+.code-block-wrapper .token.comment {
+  font-style: italic !important;
+}

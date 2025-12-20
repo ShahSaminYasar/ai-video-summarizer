@@ -23,6 +23,7 @@ import { decode } from "html-entities";
 import { formatCodeBlocks } from "@/lib/formatResponse";
 import { toast } from "sonner";
 import Link from "next/link";
+import MarkdownRenderer from "@/lib/MarkdownRenderer";
 
 const YTSummary = () => {
   const searchParams = useSearchParams();
@@ -380,7 +381,9 @@ const YTSummary = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2, type: "keyframes" }}
                 >
-                  {formatCodeBlocks(summary || "")}
+                  {/* {formatCodeBlocks(summary || "")} */}
+
+                  <MarkdownRenderer>{summary}</MarkdownRenderer>
 
                   <button
                     onClick={() => {
