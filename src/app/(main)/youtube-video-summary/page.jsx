@@ -17,19 +17,23 @@ import { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { motion, AnimatePresence } from "motion/react";
 import axios from "axios";
-import Image from "next/image";
 import parse from "html-react-parser";
 import { decode } from "html-entities";
 import { formatCodeBlocks } from "@/lib/formatResponse";
 import { toast } from "sonner";
 import Link from "next/link";
 import MarkdownRenderer from "@/lib/MarkdownRenderer";
+import { useMainContext } from "@/hooks/useMainContext";
+import { useSession } from "next-auth/react";
 
 const YTSummary = () => {
   const searchParams = useSearchParams();
   const link = searchParams?.get("link");
-  const language = searchParams?.get("lang");
-  const model = searchParams?.get("model");
+  const language = searchParams?.get("lang") || "english";
+  const model = searchParams?.get("model") || "gemini-2.5-flash";
+
+  const { theme } = useMainContext();
+  const { data: session } = useSession();
 
   //   States
   const [loading, setLoading] = useState(false);
@@ -45,6 +49,11 @@ const YTSummary = () => {
 
   useEffect(() => {
     if (!link) return redirect("/");
+
+    if (!session?.user?.email) {
+      const callbackURI = `/youtube-video-summary?link=${link}&lang=${language}&model=${model}`;
+      return redirect(`/signin?callback=${encodeURIComponent(callbackURI)}`);
+    }
 
     const fetchData = async () => {
       await getMetadata();
@@ -88,7 +97,7 @@ const YTSummary = () => {
       if (res?.data?.ok) {
         setMetadata((prev) => ({
           ...prev,
-          description: res?.data?.data || "Description not found",
+          description: res?.data?.data || null,
         }));
       }
     } catch (error) {
@@ -107,15 +116,14 @@ const YTSummary = () => {
       setLoading(true);
 
       //   Check for existing
-      const checkLocal = JSON.parse(localStorage.getItem("summaries"));
-
-      const targetLocal = checkLocal?.find(
-        (s) => s?.video === link && s?.language === language
+      const checkSaved = await axios.get(
+        `/api/history?link=${link}&lang=${language}`
       );
 
-      if (targetLocal) {
-        setSummary(targetLocal?.summary);
-        setTranscript(targetLocal?.transcript);
+      if (checkSaved?.data?.data?.length > 0) {
+        const savedItem = checkSaved?.data?.data?.[0];
+        setSummary(savedItem?.summary);
+        setTranscript(JSON.parse(savedItem?.transcript));
         return toast("Summary revised from earlier");
       } else {
         //   TRANSCRIPT
@@ -142,20 +150,25 @@ const YTSummary = () => {
           ...(model && { model }),
         });
         const summaryData = getSummary?.data?.data;
+
         if (getSummary?.data?.ok) {
-          const localSummaries = JSON.parse(
-            localStorage.getItem("summaries") || "[]"
-          );
-          localSummaries.push({
-            video: link,
-            transcript: getTranscript?.data?.data,
-            summary: summaryData,
-            language,
+          // Add to history
+          const historyInsert = await axios.post("/api/history", {
             title: metadata?.title,
+            link,
             thumbnail: metadata?.thumbnail_url,
-            datetime: new Date().toISOString(),
+            language,
+            transcript: JSON.stringify(getTranscript?.data?.data),
+            summary: summaryData,
           });
-          localStorage.setItem("summaries", JSON.stringify(localSummaries));
+
+          if (!historyInsert?.data?.ok) {
+            toast.error(
+              historyInsert?.data?.message ||
+                "Failed to save to `History`, this data CANNOT be retrieved later!"
+            );
+          }
+
           return setSummary(summaryData);
         } else {
           setSummary(null);
@@ -176,11 +189,11 @@ const YTSummary = () => {
   };
 
   return (
-    <div className="bg-white min-h-[90vh] text-black px-3 pt-[75px] md:pt-20 pb-3 grid font-space">
+    <div className="bg-background min-h-[90vh] text-black px-3 pt-[75px] md:pt-20 pb-3 grid font-space">
       <div className="w-full h-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-0 items-start justify-center">
         {/* Video */}
         <section
-          className={`w-full h-full relative md:pr-5 md:pl-2 border-slate-200 md:border-r ${
+          className={`w-full h-full relative md:pr-5 md:pl-2 border-accent md:border-r ${
             summaryZoomed ? "hidden" : "block"
           }`}
         >
@@ -223,19 +236,22 @@ const YTSummary = () => {
             </div>
 
             {metadata?.title && (
-              <h3 className="block text-xl font-medium text-zinc-900 my-3">
+              <h3 className="block text-xl font-medium text-foreground my-3">
                 {metadata?.title}
               </h3>
             )}
 
             {metadata?.description && (
-              <div className="px-4 py-2 rounded-lg bg-zinc-100 text-sm text-zinc-600 relative">
+              <div className="px-4 py-2 rounded-lg bg-card text-sm text-foreground relative">
                 <div
+                  style={{
+                    scrollbarWidth: "none",
+                  }}
                   className={`relative ${
                     descOpen
-                      ? "max-h-[300px] overflow-y-auto"
-                      : "max-h-20 overflow-y-hidden"
-                  } transition-all duration-300`}
+                      ? "max-h-[300px] overflow-y-auto wrap-break-word"
+                      : "max-h-20 overflow-y-hidden overflow-x-hidden"
+                  } transition-all duration-300 [&::-webkit-scrollbar]:hidden`}
                 >
                   {formatCodeBlocks(metadata?.description)}
 
@@ -244,7 +260,9 @@ const YTSummary = () => {
                       className="absolute bottom-0 left-0 right-0 h-10"
                       style={{
                         background:
-                          "linear-gradient(to top, #f4f4f5 20%, transparent 100%)",
+                          theme === "light"
+                            ? "linear-gradient(to top, #f4f4f5 20%, transparent 100%)"
+                            : "linear-gradient(to top, #1c1826 20%, transparent 100%)",
                       }}
                     ></div>
                   )}
@@ -252,12 +270,12 @@ const YTSummary = () => {
 
                 <div
                   className={`pt-2 flex justify-end ${
-                    descOpen ? "border-t border-zinc-200 mt-2" : ""
+                    descOpen ? "border-t border-zinc-700 mt-2" : ""
                   }`}
                 >
                   <button
                     onClick={() => setDescOpen((prev) => !prev)}
-                    className={`text-zinc-800 cursor-pointer flex items-center gap-1 text-xs font-medium`}
+                    className={`text-muted-foreground cursor-pointer flex items-center gap-1 text-xs font-medium`}
                   >
                     {descOpen ? "See less" : "See more"}
                     <ChevronDown
@@ -280,7 +298,7 @@ const YTSummary = () => {
           }`}
         >
           {/* Tab Nav */}
-          <div className="sticky top-14 md:top-16 pt-3 md:pt-4 md:-mt-4 pb-2 bg-white z-20 sm:shadow-none">
+          <div className="sticky top-14 md:top-16 pt-3 md:pt-4 md:-mt-4 pb-2 bg-background z-20 sm:shadow-none">
             <AnimatePresence>
               {!errorMsg && (
                 <motion.div
@@ -360,14 +378,20 @@ const YTSummary = () => {
 
           {/* Loading */}
           {loading && (
-            <div className="w-full p-10 min-h-[200px] flex items-center justify-center flex-col text-xs font-light text-zinc-600 -mt-8 sticky top-20">
-              <Image
+            <div className="w-full p-10 pt-20 min-h-[230px] gap-4 flex items-center justify-center flex-col text-xs font-medium text-zinc-600 -mt-8 sticky top-20">
+              {/* <Image
                 src={"/loading.gif"}
                 width={400}
                 height={500}
                 alt="Generating summary..."
                 className="w-full max-w-[170px] "
-              />
+              /> */}
+
+              <div className="ai-loader">
+                <div className="glow"></div>
+                <div className="inner"></div>
+              </div>
+
               {loadingMsg || "Processing..."}
             </div>
           )}
@@ -411,7 +435,7 @@ const YTSummary = () => {
                   {transcript?.map((t, i) => (
                     <div
                       key={`transcript_${i}`}
-                      className="w-full bg-white hover:bg-zinc-100 mb-2 text-sm font-normal text-zinc-600 rounded-lg overflow-hidden"
+                      className="w-full bg-background hover:bg-card mb-2 text-sm font-normal text-muted-foreground rounded-lg overflow-hidden"
                     >
                       <div className="w-full flex items-center flex-row justify-between gap-3 py-2 px-3">
                         <span className="text-indigo-600">

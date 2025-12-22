@@ -44,8 +44,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
-/* 
-@media (prefers-color-scheme: dark) {
+
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
@@ -54,26 +54,25 @@
 
 body {
   font-family: var(--font-space), Arial, Helvetica, sans-serif;
+  width: 100%;
+  overflow-x: hidden;
 }
-
-/* 
----break--- */
 
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: oklch(96.115% 0.00011 271.152);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(49.261% 0.00006 271.152);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: rgb(207, 207, 207);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(93.1% 0.00011 271.152);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -94,17 +93,14 @@ body {
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* 
----break--- */
-
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --background: rgb(9, 4, 20);
+  --foreground: rgb(230, 230, 230);
+  --card: rgb(28, 24, 38);
+  --card-foreground: oklch(37.649% 0.00685 17.119);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: rgb(190, 190, 190);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -121,7 +117,7 @@ body {
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: rgb(22, 17, 32);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -131,53 +127,21 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* 
----break--- */
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-primary;
   }
 }
 
-/* For Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 6px; /* thin */
-  height: 6px; /* for horizontal scroll */
-}
-
-::-webkit-scrollbar-track {
-  background: transparent; /* keep it clean */
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(128, 128, 128, 0.4); /* subtle gray */
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(128, 128, 128, 0.6); /* slightly darker on hover */
-}
-
-/* For Firefox */
-* {
-  /* transition: all 0.2s; */
-  scrollbar-width: thin; /* makes scrollbar thin */
-  scrollbar-color: rgba(128, 128, 128, 0.2) transparent; /* thumb | track */
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
-  border-radius: 20px;
+@media (min-width: 767px) {
+  html {
+    background: var(--background);
+    scrollbar-color: rgba(171, 161, 195) rgb(9, 4, 20);
+    scrollbar-width: thin;
+  }
 }
 
 /* Math block spacing */
@@ -193,4 +157,104 @@ body {
 .code-block-wrapper .token.italic,
 .code-block-wrapper .token.comment {
   font-style: italic !important;
+}
+
+.ai-loader {
+  width: 90px;
+  height: 90px;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #3bbeff,
+    #fb39c4,
+    #35f97d,
+    #7f52ea
+  );
+  filter: blur(0px);
+  animation: pulse 2.5s ease-in-out infinite;
+  box-shadow: 0 0 25px rgba(161, 140, 209, 0.5),
+    0 0 60px rgba(132, 250, 176, 0.8);
+}
+
+/* flowing gradient layer */
+.ai-loader::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #37ff80,
+    #3ebfff,
+    #8049ff,
+    #fc40c7,
+    #84fab0
+  );
+  filter: blur(25px);
+  animation: spin 6s linear infinite;
+  opacity: 0.85;
+}
+
+/* inner glow / core */
+.ai-loader span {
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  filter: blur(6px);
+  animation: breathe 2.5s ease-in-out infinite;
+}
+
+/* animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 25px rgba(161, 140, 209, 0.5),
+      0 0 60px rgba(132, 250, 176, 0.8);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 40px rgba(251, 194, 235, 0.8),
+      0 0 90px rgba(143, 211, 244, 0.7);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+button,
+input::placeholder {
+  user-select: none;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-rotate {
+  animation: rotate 3s linear infinite;
 }

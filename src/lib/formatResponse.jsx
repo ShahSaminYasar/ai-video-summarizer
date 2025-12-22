@@ -86,7 +86,7 @@ const processInlineFormatting = (text) => {
         segments.push(
           <strong
             key={`bold-${marker.pos}`}
-            className="font-medium text-slate-800"
+            className="font-medium text-foreground"
           >
             {processedContent}
           </strong>
@@ -104,7 +104,7 @@ const processInlineFormatting = (text) => {
         const content = text.slice(marker.pos + 1, closingIndex);
         const processedContent = processInlineFormatting(content);
         segments.push(
-          <em key={`italic-${marker.pos}`} className="italic text-slate-700">
+          <em key={`italic-${marker.pos}`} className="italic text-primary">
             {processedContent}
           </em>
         );
@@ -123,7 +123,7 @@ const processInlineFormatting = (text) => {
         segments.push(
           <strong
             key={`bold2-${marker.pos}`}
-            className="font-medium text-slate-800"
+            className="font-medium text-foreground"
           >
             {processedContent}
           </strong>
@@ -140,7 +140,7 @@ const processInlineFormatting = (text) => {
         const content = text.slice(marker.pos + 1, closingIndex);
         const processedContent = processInlineFormatting(content);
         segments.push(
-          <em key={`italic2-${marker.pos}`} className="italic text-slate-700">
+          <em key={`italic2-${marker.pos}`} className="italic text-primary">
             {processedContent}
           </em>
         );
@@ -235,12 +235,12 @@ const formatTextLines = (text, parentKey) => {
       const HeadingTag = `h${level}`;
 
       const classes = {
-        1: "text-3xl font-extrabold text-slate-800 mt-8 mb-4 border-b pb-2 border-slate-200",
-        2: "text-2xl font-bold text-slate-800 mt-6 mb-3",
-        3: "text-xl font-semibold text-slate-800 mt-5 mb-2",
-        4: "text-lg font-medium text-slate-800 mt-4 mb-2",
-        5: "text-md font-medium text-slate-800 mt-3 mb-1",
-        6: "text-md font-normal text-slate-800 mt-3 mb-1",
+        1: "text-3xl font-extrabold text-foreground mt-8 mb-4 border-b pb-2 border-slate-200",
+        2: "text-2xl font-bold text-foreground mt-6 mb-3",
+        3: "text-xl font-semibold text-foreground mt-5 mb-2",
+        4: "text-lg font-medium text-foreground mt-4 mb-2",
+        5: "text-md font-medium text-foreground mt-3 mb-1",
+        6: "text-md font-normal text-foreground mt-3 mb-1",
       };
 
       elements.push(
@@ -258,7 +258,7 @@ const formatTextLines = (text, parentKey) => {
     if (/^\s*\*\*.*?\*\*\s*$/.test(line)) {
       const content = line.trim().replace(/^\*\*(.*?)\*\*$/, "$1");
       elements.push(
-        <h4 key={key} className="text-lg font-medium text-slate-800 mt-4 mb-2">
+        <h4 key={key} className="text-lg font-medium text-foreground mt-4 mb-2">
           {processInlineFormatting(content)}
         </h4>
       );
@@ -352,7 +352,7 @@ const formatTextLines = (text, parentKey) => {
               const nestedKey = `${liKey}-nested-item-${nestedItemCounter}`;
               const nestedContentText = lines[k].trim().substring(2).trim();
               nestedItems.push(
-                <li key={nestedKey} className="text-slate-700 mb-1 ml-4">
+                <li key={nestedKey} className="text-primary mb-1 ml-4">
                   {processInlineFormatting(nestedContentText)}
                 </li>
               );
@@ -378,7 +378,7 @@ const formatTextLines = (text, parentKey) => {
           nestedContent.push(
             <p
               key={`${liKey}-indented-${k}`}
-              className="my-1 text-slate-700 ml-4"
+              className="my-1 text-primary ml-4"
             >
               {processInlineFormatting(indentedText)}
             </p>
@@ -388,7 +388,7 @@ const formatTextLines = (text, parentKey) => {
 
         // Build the main list item
         listItems.push(
-          <li key={liKey} className="text-slate-700 mb-3">
+          <li key={liKey} className="text-primary mb-3">
             {processInlineFormatting(content)}
             {nestedContent.length > 0 && (
               <div className="mt-1">{nestedContent}</div>
@@ -428,7 +428,7 @@ const formatTextLines = (text, parentKey) => {
         const liKey = `${key}-ul-item-${ulItemCounter}`;
         const content = lines[j].trim().substring(2).trim();
         listItems.push(
-          <li key={liKey} className="text-slate-700 mb-1">
+          <li key={liKey} className="text-primary mb-1">
             {processInlineFormatting(content)}
           </li>
         );
@@ -461,7 +461,7 @@ const formatTextLines = (text, parentKey) => {
 
     // 7. Regular Paragraph
     elements.push(
-      <p key={key} className="my-2 text-slate-700">
+      <p key={key} className="my-2 text-primary">
         {processInlineFormatting(line)}
       </p>
     );

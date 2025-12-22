@@ -1,16 +1,9 @@
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { MainProvider } from "@/providers/MainProvider";
+import AuthProvider from "@/providers/AuthProvider";
+import TanstackQueryProvider from "@/providers/TanstackQueryProvider";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotest",
@@ -18,11 +11,20 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "AI Video Summarizer",
+  title: "EinenAI",
   description:
-    "Get polished summaries of YouTube videos along with transcripts, thumbnails and much more.",
+    "Get summarized and perfectly polished notes - codes, equations, transcripts from a YouTube video - all in one place.",
   icons: "/favicon.jpg",
-  keywords: ["ai video summarizer", "video summary", "youtube video summary"],
+  keywords: [
+    "ai video summarizer",
+    "einen",
+    "ai",
+    "note taker",
+    "auto note",
+    "einenai",
+    "video summary",
+    "youtube video summary",
+  ],
   robots: "index, follow",
   authors: [{ name: "Shah Samin Yasar" }],
   metadataBase: new URL("https://ssy-ai-video-summarizer.vercel.app"),
@@ -30,26 +32,26 @@ export const metadata = {
     canonical: "./",
   },
   openGraph: {
-    title: "AI Video Summarizer",
+    title: "EinenAI",
     description:
-      "Get polished summaries of YouTube videos along with transcripts, thumbnails and much more.",
+      "Get summarized and perfectly polished notes - codes, equations, transcripts from a YouTube video - all in one place.",
     url: "https://ssy-ai-video-summarizer.vercel.app",
-    siteName: "AI Video Summarizer",
+    siteName: "EinenAI",
     type: "website",
     images: [
       {
         url: "/og-image.jpg",
         width: 1280,
         height: 630,
-        alt: "AI Video Summarizer",
+        alt: "EinenAI",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Video Summarizer",
+    title: "EinenAI",
     description:
-      "Get polished summaries of YouTube videos along with transcripts, thumbnails and much more.",
+      "Get summarized and perfectly polished notes - codes, equations, transcripts from a YouTube video - all in one place.",
     images: ["/og-image.jpg"],
   },
 };
@@ -60,7 +62,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${spaceGrotesk.variable} antialiased selection:text-white selection:bg-indigo-500`}
       >
-        {children}
+        <AuthProvider>
+          <MainProvider>
+            <TanstackQueryProvider>{children}</TanstackQueryProvider>
+          </MainProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

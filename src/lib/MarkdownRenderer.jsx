@@ -1,19 +1,26 @@
+"use client";
 import React from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { synthwave84 } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  materialOceanic,
+  zTouch,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import "katex/dist/katex.min.css";
+import { useMainContext } from "@/hooks/useMainContext";
 
 export default function MarkdownRenderer({ children }) {
+  const { theme } = useMainContext();
+
   if (!children) return null;
   const content = typeof children === "string" ? children : String(children);
 
   return (
-    <div className="text-sm text-slate-700 font-space font-normal code-block-wrapper">
+    <div className="text-sm text-primary font-space font-normal code-block-wrapper">
       <Markdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
@@ -26,7 +33,11 @@ export default function MarkdownRenderer({ children }) {
 
             if (isInline) {
               return (
-                <code className="bg-amber-100 px-1 py-0.5 rounded text-amber-600 text-xs font-medium font-mono">
+                <code
+                  className={`${
+                    theme === "light" ? "bg-amber-100" : "bg-amber-600/20"
+                  } px-1 py-0.5 rounded text-amber-600 text-xs font-medium font-mono`}
+                >
                   {children}
                 </code>
               );
@@ -43,16 +54,17 @@ export default function MarkdownRenderer({ children }) {
                   {...rest}
                   PreTag="div"
                   language={match ? match[1] : "text"}
-                  style={synthwave84}
+                  style={theme === "light" ? materialOceanic : materialOceanic}
                   codeTagProps={{
                     style: { fontFamily: "'JetBrains Mono', monospace" },
                   }}
                   customStyle={{
                     margin: 0,
                     padding: "1rem",
-                    fontSize: "0.8rem", // Slightly smaller for code looks better
+                    fontSize: "0.8rem",
                     lineHeight: "1.5",
-                    backgroundColor: "#0f172a",
+                    backgroundColor: theme === "light" ? "#010c38" : "#0f172a",
+                    scrollbarWidth: "thin",
                   }}
                 >
                   {String(children).replace(/\n$/, "")}
@@ -63,22 +75,22 @@ export default function MarkdownRenderer({ children }) {
 
           // --- HEADINGS (Explicitly sized, won't be affected by parent text-sm) ---
           h1: ({ children }) => (
-            <h1 className="text-3xl font-extrabold text-slate-900 mt-8 mb-4 border-b pb-2 border-slate-200">
+            <h1 className="text-3xl font-extrabold text-foreground mt-8 mb-4 border-b pb-2 border-slate-200">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-3">
+            <h2 className="text-2xl font-bold text-foreground mt-6 mb-3">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-xl font-semibold text-slate-800 mt-5 mb-2">
+            <h3 className="text-xl font-semibold text-foreground mt-5 mb-2">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="text-lg font-semibold text-slate-800 mt-4 mb-2">
+            <h4 className="text-lg font-semibold text-foreground mt-4 mb-2">
               {children}
             </h4>
           ),
@@ -93,7 +105,7 @@ export default function MarkdownRenderer({ children }) {
 
             if (isStandaloneBold) {
               return (
-                <h4 className="text-lg font-bold text-slate-800 mt-4 mb-2">
+                <h4 className="text-lg font-bold text-foreground mt-4 mb-2">
                   {children}
                 </h4>
               );
@@ -116,7 +128,7 @@ export default function MarkdownRenderer({ children }) {
           ),
 
           strong: ({ children }) => (
-            <strong className="font-bold text-slate-900">{children}</strong>
+            <strong className="font-bold text-foreground">{children}</strong>
           ),
           em: ({ children }) => <em className="italic">{children}</em>,
         }}

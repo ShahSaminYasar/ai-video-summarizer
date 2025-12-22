@@ -1,20 +1,23 @@
+"use client";
+import { useMainContext } from "@/hooks/useMainContext";
 import Link from "next/link";
 
 const Footer = () => {
+  const { theme } = useMainContext();
+
   return (
-    <div className="w-full bg-white px-3 pt-10 text-slate-900 border-t-2 border-slate-900 font-space">
+    <div
+      className={`${theme} w-full bg-background px-3 pt-10 text-foreground border-t border-accent font-space`}
+    >
       <footer className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 items-start justify-center">
         <div className="w-full sm:h-full flex items-center justify-start">
-          <Link href={"/"} className="text-2xl font-medium text-slate-900">
-            <span className="bg-slate-900 text-white px-2 py-1 rounded-sm">
-              AI
-            </span>{" "}
-            <span className="font-bold">Video</span>Summarizer
+          <Link href={"/"} className="text-4xl font-light text-foreground">
+            ΞIИΞИ
           </Link>
         </div>
 
         <div className="text-sm font-normal text-zinc-500 flex items-start gap-2 flex-col">
-          <h4 className="font-semibold block mb-1 text-slate-900">
+          <h4 className="font-semibold block mb-1 text-foreground">
             Useful Links
           </h4>
           <Link href={"https://youtube.com"} target="_blank">
@@ -24,7 +27,7 @@ const Footer = () => {
         </div>
 
         <div className="text-sm font-normal text-zinc-500 flex items-start gap-2 flex-col">
-          <h4 className="font-semibold block mb-1 text-slate-900">
+          <h4 className="font-semibold block mb-1 text-foreground">
             Developer Contact
           </h4>
           <Link href={"https://shahsaminyasar.vercel.app"} target="_blank">
@@ -42,7 +45,7 @@ const Footer = () => {
         </div>
 
         <div className="text-sm font-normal text-zinc-500 flex items-start gap-2 flex-col">
-          <h4 className="font-semibold block mb-1 text-slate-900">
+          <h4 className="font-semibold block mb-1 text-foreground">
             Disclaimer
           </h4>
           <p>
@@ -51,7 +54,7 @@ const Footer = () => {
           </p>
         </div>
 
-        <div className="sm:col-span-2 md:col-span-4 text-xs text-slate-500 flex items-center justify-center font-normal py-2 border-t border-slate-200">
+        <div className="sm:col-span-2 md:col-span-4 text-xs text-slate-500 flex items-center justify-center font-normal py-2 border-t border-accent">
           <p>
             Copyright 2025 &copy;{" "}
             <Link
