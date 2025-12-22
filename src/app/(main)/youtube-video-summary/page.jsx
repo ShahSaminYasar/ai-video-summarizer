@@ -206,7 +206,7 @@ const YTSummary = () => {
               className="w-full aspect-video rounded-sm overflow-hidden mb-2"
             />
 
-            <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-2 mt-3">
+            <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-3 mt-3">
               {metadata?.author_name && (
                 <Link
                   href={metadata?.author_url || "#"}
@@ -236,13 +236,13 @@ const YTSummary = () => {
             </div>
 
             {metadata?.title && (
-              <h3 className="block text-xl font-medium text-foreground my-3">
+              <h3 className="block text-xl font-medium text-foreground mt-3">
                 {metadata?.title}
               </h3>
             )}
 
-            {metadata?.description && (
-              <div className="px-4 py-2 rounded-lg bg-card text-sm text-foreground relative">
+            {metadata?.description ? (
+              <div className="px-4 mt-4 py-2 rounded-lg bg-card text-sm text-foreground relative">
                 <div
                   style={{
                     scrollbarWidth: "none",
@@ -287,6 +287,8 @@ const YTSummary = () => {
                   </button>
                 </div>
               </div>
+            ) : (
+              <div className="block w-full -mb-2"></div>
             )}
           </div>
         </section>
