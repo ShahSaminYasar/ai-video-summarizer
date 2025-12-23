@@ -56,39 +56,61 @@ export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
     const { searchParams } = new URL(req.url);
+
     const link = searchParams.get("link");
     const language = searchParams.get("lang");
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 10;
+    const skip = (page - 1) * limit;
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        {
-          ok: false,
-          message: "Authentication failed, please login",
-        },
+        { ok: false, message: "Authentication failed" },
         { status: 401 }
       );
     }
 
     await connectDB();
 
-    const result = await History.find({
+    const query = {
       user: session?.user?.id,
       ...(link ? { link } : {}),
       ...(language ? { language } : {}),
-    }).sort({ createdAt: -1 });
+    };
+
+    if (link) {
+      const result = await History.find({
+        user: session?.user?.id,
+        ...(link ? { link } : {}),
+        ...(language ? { language } : {}),
+      }).sort({ createdAt: -1 });
+
+      return NextResponse.json({
+        ok: true,
+        message: "History fetched successfully",
+        data: result,
+      });
+    }
+
+    const [result, totalDocs] = await Promise.all([
+      History.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      History.countDocuments(query),
+    ]);
+
+    const totalPages = Math.ceil(totalDocs / limit);
+    const nextPage = page < totalPages ? page + 1 : undefined;
 
     return NextResponse.json({
       ok: true,
-      message: "History fetched successfully",
-      data: result,
+      data: {
+        docs: result,
+        nextPage,
+        totalDocs,
+      },
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({
-      ok: false,
-      message: error?.message,
-      error,
-    });
+    return NextResponse.json({ ok: false, message: error?.message });
   }
 }
 
