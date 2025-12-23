@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { redirect, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { motion, AnimatePresence } from "motion/react";
 import axios from "axios";
@@ -23,8 +23,8 @@ import { formatCodeBlocks } from "@/lib/formatResponse";
 import { toast } from "sonner";
 import Link from "next/link";
 import MarkdownRenderer from "@/lib/MarkdownRenderer";
-import { useMainContext } from "@/hooks/useMainContext";
 import { useSession } from "next-auth/react";
+import moment from "moment-timezone";
 
 const YTSummary = () => {
   const searchParams = useSearchParams();
@@ -32,8 +32,10 @@ const YTSummary = () => {
   const language = searchParams?.get("lang") || "english";
   const model = searchParams?.get("model") || "gemini-2.5-flash";
 
-  const { theme } = useMainContext();
   const { data: session } = useSession();
+
+  // Refs
+  const descriptionContainerRef = useRef(null);
 
   //   States
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,7 @@ const YTSummary = () => {
   const [metadataFetched, setMetadataFetched] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
   const [summaryZoomed, setSummaryZoomed] = useState(false);
+  const [createdAt, setCreatedAt] = useState(null);
 
   useEffect(() => {
     if (!link) return redirect("/");
@@ -124,6 +127,7 @@ const YTSummary = () => {
         const savedItem = checkSaved?.data?.data?.[0];
         setSummary(savedItem?.summary);
         setTranscript(JSON.parse(savedItem?.transcript));
+        setCreatedAt(savedItem?.createdAt);
         return toast("Summary revised from earlier");
       } else {
         //   TRANSCRIPT
@@ -136,7 +140,7 @@ const YTSummary = () => {
           setTranscript(null);
           return setErrorMsg(
             getTranscript?.data?.message ||
-              "Failed to generate transcript, note that the video should contain captions (english) for a successfull summary generation."
+              "Failed to generate transcript, note that the video should contain captions for a successfull summary generation."
           );
         }
 
@@ -169,6 +173,7 @@ const YTSummary = () => {
             );
           }
 
+          setCreatedAt(new Date().toISOString());
           return setSummary(summaryData);
         } else {
           setSummary(null);
@@ -245,43 +250,41 @@ const YTSummary = () => {
               <div className="px-4 mt-4 py-2 rounded-lg bg-card text-sm text-foreground relative">
                 <div
                   style={{
-                    scrollbarWidth: "none",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#ddd transparent",
                   }}
-                  className={`relative ${
+                  ref={descriptionContainerRef}
+                  className={`relative transition-all duration-300 [&::-webkit-scrollbar]:hidden ${
                     descOpen
                       ? "max-h-[300px] overflow-y-auto wrap-break-word"
-                      : "max-h-20 overflow-y-hidden overflow-x-hidden"
-                  } transition-all duration-300 [&::-webkit-scrollbar]:hidden`}
+                      : "max-h-20 overflow-y-hidden overflow-x-hidden mask-[linear-gradient(to_bottom,black_40%,transparent_100%)]"
+                  }`}
                 >
                   {formatCodeBlocks(metadata?.description)}
-
-                  {!descOpen && (
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-10"
-                      style={{
-                        background:
-                          theme === "light"
-                            ? "linear-gradient(to top, #f4f4f5 20%, transparent 100%)"
-                            : "linear-gradient(to top, #1c1826 20%, transparent 100%)",
-                      }}
-                    ></div>
-                  )}
                 </div>
 
                 <div
                   className={`pt-2 flex justify-end ${
-                    descOpen ? "border-t border-zinc-700 mt-2" : ""
+                    descOpen ? "border-t border-accent mt-2" : ""
                   }`}
                 >
                   <button
-                    onClick={() => setDescOpen((prev) => !prev)}
-                    className={`text-muted-foreground cursor-pointer flex items-center gap-1 text-xs font-medium`}
+                    onClick={() => {
+                      setDescOpen((prev) => !prev);
+                      if (descOpen) {
+                        descriptionContainerRef?.current?.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
+                    className="text-muted-foreground cursor-pointer flex items-center gap-1 text-xs font-medium"
                   >
                     {descOpen ? "See less" : "See more"}
                     <ChevronDown
-                      className={`${
+                      className={`transition-transform duration-300 ${
                         descOpen ? "rotate-180" : "rotate-0"
-                      } transition-transform`}
+                      }`}
                       size={14}
                     />
                   </button>
@@ -411,15 +414,24 @@ const YTSummary = () => {
 
                   <MarkdownRenderer>{summary}</MarkdownRenderer>
 
-                  <button
-                    onClick={() => {
-                      window.navigator.clipboard.writeText(summary);
-                      return toast.success("Copied to clipboard");
-                    }}
-                    className="text-zinc-400 mt-5 cursor-pointer transition-all duration-100 active:scale-95 block w-fit ml-auto"
-                  >
-                    <Copy size={14} />
-                  </button>
+                  <div className="flex flex-row items-center gap-3 justify-between mt-5">
+                    <span className="block text-xs text-muted-foreground italic font-light text-left">
+                      {moment
+                        .utc(createdAt)
+                        .tz(moment.tz.guess())
+                        .format("DD MMM, YYYY hh:mma")}
+                    </span>
+
+                    <button
+                      onClick={() => {
+                        window.navigator.clipboard.writeText(summary);
+                        return toast.success("Copied to clipboard");
+                      }}
+                      className="text-zinc-400 cursor-pointer transition-all duration-100 active:scale-95 block w-fit"
+                    >
+                      <Copy size={14} />
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -462,11 +474,6 @@ const YTSummary = () => {
               )}
             </AnimatePresence>
           </div>
-
-          {/* FOR TESTING PURPOSE ONLY */}
-          {/* <pre className="bg-black w-full text-white p-2 overflow-auto text-xs">
-            {summary}
-          </pre> */}
         </section>
       </div>
     </div>

@@ -102,6 +102,7 @@ const History = () => {
           </p>
         </motion.header>
 
+        {/* ERROR */}
         {isError && (
           <div className="w-full max-w-md mx-auto bg-red-600 text-red-50 rounded-lg p-3">
             <pre>{JSON.stringify(error, null, 2)}</pre>
@@ -140,7 +141,11 @@ const History = () => {
         )}
 
         {/* SUMMARY LIST */}
-        <div className="flex flex-col border-t border-primary/10">
+        <div
+          className={`flex flex-col border-t border-primary/10 relative ${
+            isRefetching ? "animate-pulse" : ""
+          }`}
+        >
           <AnimatePresence mode="popLayout">
             {summaries &&
               summaries.map((s, i) => (
@@ -151,7 +156,7 @@ const History = () => {
                   animate="visible"
                   exit={{ opacity: 0 }}
                   layout
-                  className="group flex flex-col md:flex-row items-center gap-6 py-6 border-b border-primary/10 hover:bg-primary/2 transition-colors"
+                  className="group flex flex-col md:flex-row md:pl-2 items-center gap-6 py-6 border-b border-primary/10 hover:bg-primary/10 transition-colors"
                 >
                   {/* Thumbnail */}
                   <div className="relative w-full md:w-44 shrink-0 aspect-video bg-primary/10">
@@ -175,9 +180,12 @@ const History = () => {
 
                   {/* Info Area */}
                   <div className="grow">
-                    <div className="flex items-center gap-3 text-[10px] text-primary uppercase tracking-widest mb-1">
-                      <Clock size={10} />
-                      {moment(s?.datetime).format("DD MMM YYYY")}
+                    <div className="flex items-center gap-2 text-[10px] text-primary uppercase tracking-widest mb-1">
+                      <Clock size={10} className="-mt-px" />
+                      {moment
+                        .utc(s?.createdAt)
+                        .tz(moment.tz.guess())
+                        .format("DD MMM, YYYY hh:mma")}
                     </div>
                     <h4 className="text-lg font-medium leading-tight group-hover:text-primary transition-colors">
                       {s?.title || "Untitled"}
@@ -187,7 +195,9 @@ const History = () => {
                   {/* Actions */}
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <Link
-                      href={`/youtube-video-summary?link=${s?.link}&lang=${s?.language}`}
+                      href={`/youtube-video-summary?link=${encodeURIComponent(
+                        s?.link
+                      )}&lang=${s?.language}`}
                       className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-all"
                     >
                       Open <ArrowUpRight size={14} />
@@ -205,10 +215,6 @@ const History = () => {
               ))}
           </AnimatePresence>
         </div>
-
-        {isRefetching && (
-          <span className="block w-8 h-1 rounded-[1px] bg-muted-foreground mx-auto my-5 animate-pulse"></span>
-        )}
       </div>
     </div>
   );

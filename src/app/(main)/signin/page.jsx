@@ -1,13 +1,20 @@
 "use client";
-import React from "react";
-import { signIn } from "next-auth/react";
+import React, { useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
 const SignIn = () => {
   const searchParams = useSearchParams();
   const callbackURI = searchParams?.get("callback") || "/";
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      return redirect(callbackURI || "/");
+    }
+  }, [session]);
 
   const blurFadeVars = {
     hidden: { opacity: 0, filter: "blur(8px)" },

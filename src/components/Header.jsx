@@ -112,75 +112,91 @@ const Header = () => {
       {/* SIDEBAR */}
       <AnimatePresence>
         {sidebarOpen && (
-          <motion.nav
-            initial={{
-              x: -260,
-            }}
-            exit={{
-              x: -260,
-            }}
-            animate={{
-              x: 0,
-            }}
-            transition={{
-              duration: 0.25,
-              type: "keyframes",
-            }}
-            className={`${theme} fixed top-0 left-0 z-60 w-full max-w-[260px] h-full overflow-y-auto py-5 px-2 bg-sidebar/60 backdrop-blur-2xl font-space text-sm text-sidebar-foreground font-normal shadow-lg shadow-black/10 flex flex-col`}
-          >
-            <button
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
-              className="cursor-pointer block w-fit ml-auto text-primary mb-4 mr-1"
-            >
-              <ChevronLeftSquare size={22} />
-            </button>
+              className="block fixed inset-0 w-full h-full bg-black/30 z-60 backdrop-blur-[2px]"
+            ></motion.div>
 
-            <button
-              onClick={() => {
-                setSidebarOpen(false);
-                redirect("/");
+            <motion.nav
+              initial={{
+                x: -260,
               }}
-              className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
-            >
-              <PenBox size={17} /> New Summary
-            </button>
-            <button
-              onClick={() => {
-                setSidebarOpen(false);
-                redirect("/history");
+              exit={{
+                x: -260,
               }}
-              className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
+              animate={{
+                x: 0,
+              }}
+              transition={{
+                duration: 0.25,
+                type: "keyframes",
+              }}
+              className={`${theme} fixed top-0 left-0 z-60 w-full max-w-[260px] h-full overflow-y-auto py-5 px-2 bg-sidebar/60 backdrop-blur-2xl font-space text-sm text-sidebar-foreground font-normal shadow-lg shadow-black/10 flex flex-col`}
             >
-              <History size={17} /> History
-            </button>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="cursor-pointer block w-fit ml-auto text-primary mb-4 mr-1"
+              >
+                <ChevronLeftSquare size={22} />
+              </button>
 
-            <div className="w-full flex flex-row items-center justify-center gap-4 flex-wrap mt-auto text-primary">
-              <Link href={"https://github.com/ShahSaminYasar"} target="_blank">
-                <Github size={18} />
-              </Link>
-              <Link href={"https://shahsaminyasar.vercel.app"} target="_blank">
-                <Globe size={18} />
-              </Link>
-              <Link
-                href={"https://www.instagram.com/shah_samin_yasar"}
-                target="_blank"
+              <button
+                onClick={() => {
+                  setSidebarOpen(false);
+                  redirect("/");
+                }}
+                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
               >
-                <Instagram size={18} />
-              </Link>
-              <Link
-                href={"https://www.facebook.com/shahsaminyasar"}
-                target="_blank"
+                <PenBox size={17} /> New Summary
+              </button>
+              <button
+                onClick={() => {
+                  setSidebarOpen(false);
+                  redirect("/history");
+                }}
+                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
               >
-                <Facebook size={18} />
-              </Link>
-              <Link
-                href={"https://www.youtube.com/shahsaminyasar"}
-                target="_blank"
-              >
-                <Youtube size={20} />
-              </Link>
-            </div>
-          </motion.nav>
+                <History size={17} /> History
+              </button>
+
+              <div className="w-full flex flex-row items-center justify-center gap-4 flex-wrap mt-auto text-primary">
+                <Link
+                  href={"https://github.com/ShahSaminYasar"}
+                  target="_blank"
+                >
+                  <Github size={18} />
+                </Link>
+                <Link
+                  href={"https://shahsaminyasar.vercel.app"}
+                  target="_blank"
+                >
+                  <Globe size={18} />
+                </Link>
+                <Link
+                  href={"https://www.instagram.com/shah_samin_yasar"}
+                  target="_blank"
+                >
+                  <Instagram size={18} />
+                </Link>
+                <Link
+                  href={"https://www.facebook.com/shahsaminyasar"}
+                  target="_blank"
+                >
+                  <Facebook size={18} />
+                </Link>
+                <Link
+                  href={"https://www.youtube.com/shahsaminyasar"}
+                  target="_blank"
+                >
+                  <Youtube size={20} />
+                </Link>
+              </div>
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </>

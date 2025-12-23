@@ -75,7 +75,7 @@ export async function GET(req) {
       user: session?.user?.id,
       ...(link ? { link } : {}),
       ...(language ? { language } : {}),
-    });
+    }).sort({ createdAt: -1 });
 
     return NextResponse.json({
       ok: true,
