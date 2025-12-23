@@ -23,9 +23,7 @@ export async function GET(req) {
         },
       }
     );
-
     const result = await response.json();
-
     if (result?.transcript?.length > 0) {
       return NextResponse.json({
         ok: true,
