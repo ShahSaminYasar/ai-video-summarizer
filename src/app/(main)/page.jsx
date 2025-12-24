@@ -26,7 +26,7 @@ const Home = () => {
 
   return (
     <section
-      className="w-full px-3 bg-linear-to-r min-h-[70vh] md:min-h-screen pt-[60px] pb-10 flex flex-col items-center justify-center relative"
+      className="w-full px-3 bg-linear-to-r min-h-[90vh] md:min-h-screen pt-[60px] pb-10 flex flex-col items-center justify-center relative"
       style={{
         backgroundImage:
           theme === "light" ? "url(/white-bg.jpg)" : "url(/dark-bg.png)",

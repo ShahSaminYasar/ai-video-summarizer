@@ -218,8 +218,8 @@ const YTSummary = () => {
                 controls={true}
                 width={"100%"}
                 height={"auto"}
-                className={`w-full aspect-video rounded-sm overflow-hidden ${
-                  playerFixed ? "" : "mb-2"
+                className={`w-full aspect-video overflow-hidden ${
+                  playerFixed ? "rounded-none" : "mb-2 rounded-sm"
                 }`}
               />
             </div>
@@ -258,7 +258,9 @@ const YTSummary = () => {
 
               <button
                 onClick={() => setPlayerFixed((prev) => !prev)}
-                className="block md:hidden ml-auto w-fit text-zinc-400 cursor-pointer active:scale-95 transition-all duration-150"
+                className={`block md:hidden ml-auto w-fit cursor-pointer active:scale-95 transition-all duration-150 ${
+                  playerFixed ? "text-zinc-400" : "text-zinc-500"
+                }`}
               >
                 <TvMinimal size={18} />
               </button>
