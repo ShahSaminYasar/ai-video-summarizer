@@ -208,7 +208,9 @@ const YTSummary = () => {
           <div className="md:sticky md:top-20">
             <div
               className={`w-full bg-background transition-all duration-300 ${
-                playerFixed ? "fixed top-[60px] h-fit left-0 z-50" : "relative"
+                playerFixed
+                  ? "fixed md:relative top-[60px] md:top-0 h-fit left-0 z-50"
+                  : "relative"
               }`}
             >
               <ReactPlayer
@@ -216,12 +218,14 @@ const YTSummary = () => {
                 controls={true}
                 width={"100%"}
                 height={"auto"}
-                className={`w-full aspect-video rounded-sm overflow-hidden mb-2`}
+                className={`w-full aspect-video rounded-sm overflow-hidden ${
+                  playerFixed ? "" : "mb-2"
+                }`}
               />
             </div>
 
             {playerFixed && (
-              <div className="w-full aspect-video bg-red-600"></div>
+              <div className="w-full aspect-video bg-transparent block md:hidden"></div>
             )}
 
             <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-3 mt-3">

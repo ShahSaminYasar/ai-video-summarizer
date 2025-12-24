@@ -149,7 +149,7 @@ const Header = () => {
                   setSidebarOpen(false);
                   redirect("/");
                 }}
-                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
+                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer mb-1"
               >
                 <PenBox size={17} /> New Summary
               </button>
@@ -158,7 +158,7 @@ const Header = () => {
                   setSidebarOpen(false);
                   redirect("/history");
                 }}
-                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer"
+                className="flex flex-row items-center gap-2 w-full py-2 hover:bg-primary hover:text-background rounded-lg px-3 cursor-pointer mb-1"
               >
                 <History size={17} /> History
               </button>
