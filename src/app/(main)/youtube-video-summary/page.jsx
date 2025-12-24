@@ -6,8 +6,10 @@ import {
   Download,
   Maximize,
   Minimize,
+  Minimize2,
   RefreshCcw,
   Share2,
+  TvMinimal,
   User,
   WandSparkles,
   X,
@@ -49,6 +51,7 @@ const YTSummary = () => {
   const [descOpen, setDescOpen] = useState(false);
   const [summaryZoomed, setSummaryZoomed] = useState(false);
   const [createdAt, setCreatedAt] = useState(null);
+  const [playerFixed, setPlayerFixed] = useState(true);
 
   useEffect(() => {
     if (!link) return redirect("/");
@@ -203,13 +206,23 @@ const YTSummary = () => {
           }`}
         >
           <div className="md:sticky md:top-20">
-            <ReactPlayer
-              src={link}
-              controls={true}
-              width={"100%"}
-              height={"100%"}
-              className="w-full aspect-video rounded-sm overflow-hidden mb-2"
-            />
+            <div
+              className={`w-full bg-background transition-all duration-300 ${
+                playerFixed ? "fixed top-[60px] h-fit left-0 z-50" : "relative"
+              }`}
+            >
+              <ReactPlayer
+                src={link}
+                controls={true}
+                width={"100%"}
+                height={"auto"}
+                className={`w-full aspect-video rounded-sm overflow-hidden mb-2`}
+              />
+            </div>
+
+            {playerFixed && (
+              <div className="w-full aspect-video bg-red-600"></div>
+            )}
 
             <div className="w-full flex flex-row flex-wrap justify-start items-center gap-5 mb-3 mt-3">
               {metadata?.author_name && (
@@ -236,7 +249,14 @@ const YTSummary = () => {
                 }}
                 className="text-zinc-500 cursor-pointer transition-all duration-100 active:scale-95 flex items-center flex-row gap-1 text-xs"
               >
-                <Copy size={14} /> Copy Link
+                <Copy size={14} /> Link
+              </button>
+
+              <button
+                onClick={() => setPlayerFixed((prev) => !prev)}
+                className="block md:hidden ml-auto w-fit text-zinc-400 cursor-pointer active:scale-95 transition-all duration-150"
+              >
+                <TvMinimal size={18} />
               </button>
             </div>
 
